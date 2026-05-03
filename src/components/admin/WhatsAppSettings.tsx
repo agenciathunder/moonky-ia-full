@@ -84,44 +84,21 @@ export const WhatsAppSettings = ({ establishmentId }: { establishmentId: string 
     setLoading(true);
     try {
       const instanceName = `loja-${establishmentId}`;
-      
-      // Attempt to create the instance
-      const response = await fetch(`http://142.93.251.83:8080/instance/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": "moonky_admin_123"
-        },
-        body: JSON.stringify({
-          instanceName: instanceName,
-          qrcode: true,
-          integration: "WHATSAPP-BAILEYS"
-        })
+
+      const { data, error } = await supabase.functions.invoke("whatsapp-connect", {
+        body: { action: "create", instanceName },
       });
-      
-      const data = await response.json();
-      
-      if (data && data.qrcode && data.qrcode.base64) {
-        setQrCode(data.qrcode.base64);
-        
-        // Save the instanceName in the database
+
+      if (error) throw error;
+
+      if (data?.qrcode) {
+        setQrCode(data.qrcode);
         await supabase
           .from('establishments')
           .update({ whatsapp_instance_name: instanceName })
           .eq('id', establishmentId);
-          
       } else {
-        // If it already exists or didn't return QR on creation, let's try to fetch the connection QR
-        const connectResponse = await fetch(`http://142.93.251.83:8080/instance/connect/${instanceName}`, {
-           method: "GET",
-           headers: { "apikey": "moonky_admin_123" }
-        });
-        const connectData = await connectResponse.json();
-        if (connectData && connectData.base64) {
-           setQrCode(connectData.base64);
-        } else {
-           throw new Error("Não foi possível gerar o QR Code");
-        }
+        throw new Error("Não foi possível gerar o QR Code");
       }
     } catch (error) {
       console.error(error);
