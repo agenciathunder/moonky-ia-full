@@ -1,0 +1,13 @@
+project_id = "rodxryszitosrdwbzosm"
+
+[functions.create-establishment]
+verify_jwt = false
+
+[functions.update-establishment-password]
+verify_jwt = false
+
+[functions.manage-user]
+verify_jwt = false
+
+[functions.import-menu]
+verify_jwt = false

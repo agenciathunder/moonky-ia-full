@@ -1,0 +1,1 @@
+UPDATE public.establishments SET slug = 'forbin' WHERE id = '4fd77c75-16f7-4ec2-b4e6-77d2b9650c74' AND slug = '/forbin'
